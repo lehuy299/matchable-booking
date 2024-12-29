@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Mock available sessions and bookings
 const availableSessions = [
@@ -55,9 +56,7 @@ const mockBookings = [
 ];
 
 const BookingCard = ({ booking }) => (
-  <div
-    className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 w-[300px] h-[150px]"
-  >
+  <div className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 w-[300px] h-[150px]">
     <p>
       <span className="font-medium">Session:</span> {booking.session}
     </p>
@@ -75,9 +74,8 @@ const BookingCard = ({ booking }) => (
   </div>
 );
 
-function SessionSelection() {
+function SessionSelection({ cartList, setCartList, setStep }) {
   const [selectedSession, setSelectedSession] = useState(null);
-  const [cartList, setCartList] = useState([]);
   const [startTime, setStartTime] = useState("");
   const [selectedDuration, setSelectedDuration] = useState(1);
   const [selectedTrainer, setSelectedTrainer] = useState("");
@@ -123,12 +121,6 @@ function SessionSelection() {
     };
 
     setCartList([...cartList, sessionDetails]);
-
-    // Reset state
-    setSelectedSession(null);
-    setStartTime("");
-    setSelectedTrainer("");
-    setSelectedDuration(1);
   };
 
   return (
@@ -147,11 +139,12 @@ function SessionSelection() {
         )}
       </div>
       {/* Session Selection Form */}
-      <div className="space-y-4">
+      <div className="space-y-4 w-2/3 ml-auto mr-auto">
+        <h2 className="text-lg font-bold">Book your own session</h2>
         <div>
-          <label className="block mb-2 text-sm font-medium">
+          <Label className="block mb-2 text-sm font-medium">
             Select Session
-          </label>
+          </Label>
           <Select
             onValueChange={(value) =>
               setSelectedSession(
@@ -173,9 +166,9 @@ function SessionSelection() {
         </div>
 
         <div>
-          <label className="block mb-2 text-sm font-medium">
+          <Label className="block mb-2 text-sm font-medium">
             Select Time and Duration
-          </label>
+          </Label>
           <Input
             type="datetime-local"
             value={startTime}
@@ -200,9 +193,9 @@ function SessionSelection() {
         </div>
 
         <div>
-          <label className="block mb-2 text-sm font-medium">
+          <Label className="block mb-2 text-sm font-medium">
             Select Trainer
-          </label>
+          </Label>
           <Select
             onValueChange={(value) => setSelectedTrainer(value)}
             disabled={!selectedSession}
@@ -233,12 +226,19 @@ function SessionSelection() {
           >
             Add to Cart
           </Button>
+          <Button
+            onClick={() => setStep("cart")}
+            className="w-full mt-4"
+            disabled={!cartList.length}
+          >
+            Book now
+          </Button>
         </div>
       </div>
 
       {/* Cart List */}
       <div className="">
-        <h2 className="text-lg font-semibold mb-4">Cart</h2>
+        <h2 className="text-lg font-semibold mb-4">Current Cart</h2>
         {cartList.length === 0 ? (
           <p className="text-sm text-gray-500">
             No sessions added to the cart.
