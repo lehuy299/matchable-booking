@@ -127,7 +127,7 @@ function SessionSelection({ cartList, setCartList, setStep }) {
     <div className="space-y-6">
       {/* Available Bookings */}
       <div>
-        <h2 className="text-lg font-semibold mb-2">Available Bookings</h2>
+        <h2 className="text-lg font-semibold mb-2">Current Bookings</h2>
         {mockBookings.length === 0 ? (
           <p className="text-sm text-gray-500">No bookings found.</p>
         ) : (
@@ -239,7 +239,7 @@ function SessionSelection({ cartList, setCartList, setStep }) {
       {/* Cart List */}
       <div className="">
         <h2 className="text-lg font-semibold mb-4">Current Cart</h2>
-        {cartList.length === 0 ? (
+        {/* {cartList.length === 0 ? (
           <p className="text-sm text-gray-500">
             No sessions added to the cart.
           </p>
@@ -271,7 +271,7 @@ function SessionSelection({ cartList, setCartList, setStep }) {
               </div>
             ))}
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
