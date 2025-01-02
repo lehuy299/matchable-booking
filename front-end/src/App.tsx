@@ -5,6 +5,7 @@ import Topbar from "./components/Topbar";
 import { Route, Routes } from "react-router";
 import { Cart } from "./types/types";
 import AvailableSessions from "./components/AvailableSessions";
+import LoginPage from "./components/LoginPage";
 
 function App() {
   const [cartList, setCartList] = useState<Cart[]>([]);
@@ -39,6 +40,7 @@ function App() {
               />
             }
           />
+          <Route path='login' element={<LoginPage />} />
         </Routes>
       </div>
     </div>
