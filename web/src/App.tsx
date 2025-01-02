@@ -1,20 +1,17 @@
 import React, { useState } from "react";
-import SessionSelection from "./components/SessionSelection";
+import YourBookings from "./components/YourBookings";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CheckoutPage from "./components/CheckoutPage";
 import Topbar from "./components/Topbar";
+import { Route, Routes } from "react-router";
+import { Cart } from "./types/types";
 
 function App() {
-  const [cartList, setCartList] = useState([]);
+  const [cartList, setCartList] = useState<Cart[]>([]);
   const [showCart, setShowCart] = useState(false);
-  const [step, setStep] = useState('booking');
 
-  const handleAddToCart = (session) => {
-    setCartList([...cartList, session]);
-  };
-
-  const handleRemoveFromCart = (index) => {
+  const handleRemoveFromCart = (index: number) => {
     const updatedCart = [...cartList];
     updatedCart.splice(index, 1);
     setCartList(updatedCart);
@@ -26,12 +23,12 @@ function App() {
 
   return (
     <div className="w-full">
-      {step === 'booking' && <Topbar onViewCart={handleViewCart} cartList={cartList} />}
+      <Topbar onViewCart={handleViewCart} cartList={cartList} />
       <div className="w-full p-6">
-        {
+        {/* {
           step === 'booking' &&
           <>
-            <SessionSelection setCartList={setCartList} cartList={cartList} setStep={setStep} />
+            <YourBookings setCartList={setCartList} cartList={cartList} setStep={setStep} />
           </>
         }
         {
@@ -42,7 +39,28 @@ function App() {
             </Button>
             <CheckoutPage cartList={cartList} onRemove={handleRemoveFromCart} setStep={setStep} />
           </>
-        }
+        } */}
+        <Routes>
+          <Route path="available-bookings" element={<div />} />
+          <Route
+            path="your-bookings"
+            element={
+              <YourBookings
+                setCartList={setCartList}
+                cartList={cartList}
+              />
+            }
+          />
+          <Route
+            path="checkout"
+            element={
+              <CheckoutPage
+                cartList={cartList}
+                onRemove={handleRemoveFromCart}
+              />
+            }
+          />
+        </Routes>
       </div>
     </div>
   );

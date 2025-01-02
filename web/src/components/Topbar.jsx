@@ -1,34 +1,78 @@
 import React from "react";
+import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { format } from "date-fns";
+
+const CartItem = ({ item }) => (
+  <div className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 h-[150px]">
+    <p>
+      <span className="font-medium">Session:</span> {item.session}
+    </p>
+    <p>
+      <span className="font-medium">Trainer:</span> {item.trainer.name}
+    </p>
+    <p>
+      <span className="font-medium">Start date:</span>{" "}
+      {format(item.startTime, "yyyy-MM-dd")}
+    </p>
+    <p>
+      <span className="font-medium">Time slot:</span>{" "}
+      {format(item.startTime, "HH:mm")} - {item.duration} Hour
+      {item.duration > 1 ? "s" : ""}
+    </p>
+  </div>
+);
 
 function Topbar({ onViewCart, cartList }) {
   return (
     <div className="bg-zinc-900 text-white p-4 flex justify-between items-center shadow-md">
-      {/* Brand Name */}
-      <div className="text-xl font-bold">Matchable</div>
-
-      {/* View Cart Button */}
-      {/* <Button
-        onClick={onViewCart}
-        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-200"
-      >
-        View Cart
-      </Button> */}
+      <div className="flex gap-4 align-middle">
+        <div className="text-xl font-bold">Matchable</div>
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/available-bookings" className={`${navigationMenuTriggerStyle()} cursor-pointer`}>
+                Available Bookings
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/your-bookings" className={`${navigationMenuTriggerStyle()} cursor-pointer`}>
+                Your Bookings
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/checkout" className={`${navigationMenuTriggerStyle()} cursor-pointer`}>
+                Checkout
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
       <Popover className="left-4">
         <PopoverTrigger asChild>
           <Button
             onClick={onViewCart}
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-200"
+            size="icon"
+            className="bg-white hover:bg-gray-100 hover:border-gray-100 text-black rounded-full transition duration-200 mr-2 relative"
           >
-            View Cart
+            <ShoppingCart className="w-8 h-8" />
+            {!!cartList.length && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex justify-center items-center text-xs">
+                {cartList.length}
+              </div>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 mr-[15px]">
@@ -39,29 +83,7 @@ function Topbar({ onViewCart, cartList }) {
           ) : (
             <div className="flex gap-2 flex-col">
               {cartList.map((item, index) => (
-                <div
-                  key={index}
-                  className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 w-[300px] h-[186px]"
-                >
-                  <p>
-                    <span className="font-medium">Session:</span>{" "}
-                    {item.sessionType}
-                  </p>
-                  <p>
-                    <span className="font-medium">Start Time:</span>{" "}
-                    {format(item.startTime, "yyyy-MM-dd HH:mm")}
-                  </p>
-                  <p>
-                    <span className="font-medium">End Time:</span>{" "}
-                    {format(item.endTime, "yyyy-MM-dd HH:mm")}
-                  </p>
-                  <p>
-                    <span className="font-medium">Trainer:</span> {item.trainer}
-                  </p>
-                  <p>
-                    <span className="font-medium">Price:</span> ${item.price}
-                  </p>
-                </div>
+                <CartItem key={index} item={item} />
               ))}
             </div>
           )}

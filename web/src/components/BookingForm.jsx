@@ -31,8 +31,6 @@ function BookingForm({ onSubmit }) {
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-4">
       <h2 className="text-lg font-bold">Please enter your personal details</h2>
-
-      {/* Name */}
       <div>
         <Label className="block text-sm font-medium">Name</Label>
         <Input
