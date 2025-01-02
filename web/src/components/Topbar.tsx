@@ -1,4 +1,3 @@
-import React from "react";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,14 +13,19 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { format } from "date-fns";
+import { Cart } from "@/types/types";
 
-const CartItem = ({ item }) => (
+interface CartItemProps {
+  item: Cart;
+}
+
+const CartItem = ({ item }: CartItemProps) => (
   <div className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 h-[150px]">
     <p>
-      <span className="font-medium">Session:</span> {item.session}
+      <span className="font-medium">Session:</span> {item.sessionType}
     </p>
     <p>
-      <span className="font-medium">Trainer:</span> {item.trainer.name}
+      <span className="font-medium">Trainer:</span> {item.trainer}
     </p>
     <p>
       <span className="font-medium">Start date:</span>{" "}
@@ -35,7 +39,11 @@ const CartItem = ({ item }) => (
   </div>
 );
 
-function Topbar({ onViewCart, cartList }) {
+interface TopbarProps {
+  cartList: Cart[];
+};
+
+function Topbar({ cartList }: TopbarProps) {
   return (
     <div className="bg-zinc-900 text-white p-4 flex justify-between items-center shadow-md">
       <div className="flex gap-4 align-middle">
@@ -60,10 +68,9 @@ function Topbar({ onViewCart, cartList }) {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      <Popover className="left-4">
+      <Popover>
         <PopoverTrigger asChild>
           <Button
-            onClick={onViewCart}
             size="icon"
             className="bg-white hover:bg-gray-100 hover:border-gray-100 text-black rounded-full transition duration-200 mr-2 relative"
           >

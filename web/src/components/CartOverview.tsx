@@ -1,13 +1,16 @@
+import { Cart } from "@/types/types";
 import { format } from "date-fns";
-import React from "react";
 
-function CartOverview({ cartList, onRemove }) {
+interface CartOverviewProps {
+  cartList: Cart[];
+  onRemove: (index: number) => void;
+};
+
+function CartOverview({ cartList, onRemove }: CartOverviewProps) {
   const totalCost = cartList.reduce((total, session) => total + session.price, 0);
 
   return (
     <div>
-      <h2 className="text-lg font-bold">Cart Overview</h2>
-
       {cartList.length === 0 ? (
         <p className="text-gray-500">No sessions added to the cart yet.</p>
       ) : (

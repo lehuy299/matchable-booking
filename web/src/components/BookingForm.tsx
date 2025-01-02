@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-function BookingForm({ onSubmit }) {
+function BookingForm() {
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -24,7 +24,7 @@ function BookingForm({ onSubmit }) {
         .required(),
     }),
     onSubmit: (values) => {
-      onSubmit(values);
+      console.log(values);
     },
   });
 
@@ -93,7 +93,6 @@ function BookingForm({ onSubmit }) {
             checked={formik.values.termsAccepted}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            size='icon'
           />
           <span className="text-sm">
             I accept the{" "}

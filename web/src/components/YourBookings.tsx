@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Cart } from "@/types/types";
+import { Cart, Session } from "@/types/types";
+import { useSearchParams } from "react-router";
 
 // Mock available sessions and bookings
 const availableSessions = [
@@ -93,36 +94,6 @@ const mockBookings = [
     startTime: new Date("2024-12-28T15:00"),
     endTime: new Date("2024-12-28T16:00"),
   },
-  {
-    session: "Padel",
-    trainer: {
-      id: "1",
-      name: "John",
-      price: 50,
-    },
-    startTime: new Date("2024-12-28T10:00"),
-    endTime: new Date("2024-12-28T12:00"),
-  },
-  {
-    session: "Padel",
-    trainer: {
-      id: "2",
-      name: "Sara",
-      price: 40,
-    },
-    startTime: new Date("2024-12-28T09:00"),
-    endTime: new Date("2024-12-28T10:30"),
-  },
-  {
-    session: "Tennis",
-    trainer: {
-      id: "3",
-      name: "Mike",
-      price: 60,
-    },
-    startTime: new Date("2024-12-28T15:00"),
-    endTime: new Date("2024-12-28T16:00"),
-  },
 ];
 
 // const mockTrainer = [
@@ -167,7 +138,7 @@ interface BookingCardProps {
     };
     startTime: Date;
     endTime: Date;
-  }
+  };
 }
 
 const BookingCard = ({ booking }: BookingCardProps) => (
@@ -192,19 +163,32 @@ const BookingCard = ({ booking }: BookingCardProps) => (
 interface YourBookingsProps {
   cartList: Cart[];
   setCartList: (value: Cart[]) => void;
+  selectedSession?: Session;
 }
 
 function YourBookings({ cartList, setCartList }: YourBookingsProps) {
-  const [selectedSessionId, setSelectedSessionId] = useState<string>('');
-  const selectedSession = availableSessions.find((session) => session.id === selectedSessionId);
+  const [searchParams] = useSearchParams();
+  const sessionIdFromURL = searchParams.get("sessionId") || "";
+
+  const [selectedSessionId, setSelectedSessionId] = useState<string>(sessionIdFromURL);
+  console.log('selectedSessionId', selectedSessionId);
+  
+  const selectedSession = availableSessions.find(
+    (session) => session.id === selectedSessionId
+  );
   const [startTime, setStartTime] = useState("");
-  const [selectedDuration, setSelectedDuration] = useState<string>('1');
+  const [selectedDuration, setSelectedDuration] = useState<string>("1");
   const [selectedTrainerId, setSelectedTrainerId] = useState("");
-  const selectedTrainer = selectedSession?.trainers.find((trainer) => trainer.id === selectedTrainerId);
+  const selectedTrainer = selectedSession?.trainers.find(
+    (trainer) => trainer.id === selectedTrainerId
+  );
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log('selectedSessionId', selectedSessionId);
-  console.log('selectedTrainer', selectedTrainer);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -261,11 +245,15 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
         )}
       </div>
       {/* Session Selection Form */}
-      <div className="space-y-4 w-2/3 ml-auto mr-auto">
+      <div
+        className={`space-y-4 w-2/3 ml-auto mr-auto transform transition duration-500 ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+        }`}
+      >
         <h2 className="text-lg font-bold">Book your own session</h2>
         <div>
           <Label className="block mb-2 text-sm font-medium">Session</Label>
-          <Select onValueChange={(value) => setSelectedSessionId(value)}>
+          <Select value={selectedSessionId} onValueChange={(value) => setSelectedSessionId(value)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select Session Type" />
             </SelectTrigger>

@@ -1,15 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import YourBookings from "./components/YourBookings";
-import { ChevronLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import CheckoutPage from "./components/CheckoutPage";
 import Topbar from "./components/Topbar";
 import { Route, Routes } from "react-router";
 import { Cart } from "./types/types";
+import AvailableSessions from "./components/AvailableSessions";
 
 function App() {
   const [cartList, setCartList] = useState<Cart[]>([]);
-  const [showCart, setShowCart] = useState(false);
 
   const handleRemoveFromCart = (index: number) => {
     const updatedCart = [...cartList];
@@ -17,31 +15,12 @@ function App() {
     setCartList(updatedCart);
   };
 
-  const handleViewCart = () => {
-    setShowCart(true);
-  };
-
   return (
     <div className="w-full">
-      <Topbar onViewCart={handleViewCart} cartList={cartList} />
+      <Topbar cartList={cartList} />
       <div className="w-full p-6">
-        {/* {
-          step === 'booking' &&
-          <>
-            <YourBookings setCartList={setCartList} cartList={cartList} setStep={setStep} />
-          </>
-        }
-        {
-          step === 'cart' &&
-          <>
-            <Button className='mb-4' variant="outline" onClick={() => setStep('booking')}>
-              <ChevronLeft /> Go back
-            </Button>
-            <CheckoutPage cartList={cartList} onRemove={handleRemoveFromCart} setStep={setStep} />
-          </>
-        } */}
         <Routes>
-          <Route path="available-bookings" element={<div />} />
+          <Route path="available-bookings" element={<AvailableSessions />} />
           <Route
             path="your-bookings"
             element={
