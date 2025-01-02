@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { add, format } from "date-fns";
+import { add, format, set } from "date-fns";
 import {
   Select,
   SelectTrigger,
@@ -96,39 +96,6 @@ const mockBookings = [
   },
 ];
 
-// const mockTrainer = [
-//   {
-//     id: 1,
-//     name: "John",
-//     price: 50,
-//   },
-//   {
-//     id: 2,
-//     name: "Sara",
-//     price: 40,
-//   },
-//   {
-//     id: 3,
-//     name: "Tom",
-//     price: 60,
-//   },
-//   {
-//     id: 4,
-//     name: "Anna",
-//     price: 60,
-//   },
-//   {
-//     id: 5,
-//     name: "Mike",
-//     price: 60,
-//   },
-//   {
-//     id: 6,
-//     name: "Emma",
-//     price: 60,
-//   },
-// ];
-
 interface BookingCardProps {
   booking: {
     session: string;
@@ -159,6 +126,10 @@ const BookingCard = ({ booking }: BookingCardProps) => (
     </p>
   </div>
 );
+
+const getHourDisplay = (hour: string | number) => {
+  return `${hour} Hour${Number(hour) > 1 ? "s" : ""}`;
+};
 
 interface YourBookingsProps {
   cartList: Cart[];
@@ -221,6 +192,10 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
     };
 
     setCartList([...cartList, sessionDetails]);
+    setSelectedSessionId("");
+    setStartTime("");
+    setSelectedDuration("1");
+    setSelectedTrainerId("");
   };
 
   return (
@@ -299,12 +274,13 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
           <div className="w-1/2 -mt-2">
             <Select onValueChange={(value) => setSelectedDuration(value)}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Duration (Hours)" />
+                {/* <SelectValue placeholder="Select Duration (Hours)" /> */}
+                {selectedDuration ? getHourDisplay(selectedDuration) : "Select Duration (Hours)"}
               </SelectTrigger>
               <SelectContent>
                 {[1, 2, 3, 4].map((hour) => (
                   <SelectItem key={hour} value={hour.toString()}>
-                    {hour} Hour{hour > 1 ? "s" : ""}
+                    {getHourDisplay(hour)}
                   </SelectItem>
                 ))}
               </SelectContent>
