@@ -5,84 +5,7 @@ import { useNavigate } from "react-router";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import { MultiSelect } from "./ui/multi-select";
 import { Button } from "./ui/button";
-
-const mockAvailableSessions = [
-  {
-    id: "1",
-    type: "Padel",
-    trainers: [
-      {
-        id: "1",
-        name: "John",
-      },
-      {
-        id: "2",
-        name: "Sara",
-      },
-    ],
-  },
-  {
-    id: "2",
-    type: "Tennis",
-    trainers: [
-      {
-        id: "3",
-        name: "Mike",
-      },
-    ],
-  },
-  {
-    id: "3",
-    type: "Fitness",
-    trainers: [
-      {
-        id: "4",
-        name: "Anna",
-      },
-      {
-        id: "5",
-        name: "Tom",
-      },
-      {
-        id: "6",
-        name: "Emma",
-      },
-    ],
-  },
-];
-
-const mockTrainer = [
-  {
-    id: "1",
-    name: "John",
-    price: 50,
-  },
-  {
-    id: "2",
-    name: "Sara",
-    price: 40,
-  },
-  {
-    id: "3",
-    name: "Tom",
-    price: 60,
-  },
-  {
-    id: "4",
-    name: "Anna",
-    price: 60,
-  },
-  {
-    id: "5",
-    name: "Mike",
-    price: 60,
-  },
-  {
-    id: "6",
-    name: "Emma",
-    price: 60,
-  },
-];
+import { useSessionsQuery, useTrainersQuery } from "@/api/queries";
 
 interface SessionCardProps {
   session: Session;
@@ -93,39 +16,44 @@ const SessionCard = ({ session }: SessionCardProps) => {
   return (
     <div
       onClick={() => navigate(`/your-bookings?sessionId=${session.id}`)}
-      className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 w-[19%] h-[150px] flex flex-col items-center justify-center gap-3 hover:border-blue-400 border-2 transition cursor-pointer"
+      className="p-4 rounded-md shadow-sm space-y-2 bg-gray-50 w-[19%] h-[150px] flex flex-col items-center justify-center gap-3 hover:border-blue-400 border-2 transition cursor-pointer"
     >
       <p>
-        <span className="font-medium">Session:</span> {session.type}
+        <span className="font-medium">Session:</span> {session.name}
       </p>
       <p>
         <span className="font-medium">Trainer:</span>{" "}
-        {session.trainers.map((trainer) => trainer.name).join(", ")}
+        {session?.trainers?.map((trainer) => trainer.name).join(", ")}
       </p>
     </div>
   );
 };
 
 const AvailableSessions = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { data: sessionsData, isLoading: isSessionsLoading } = useSessionsQuery();
+  const sessions = sessionsData?.data || [];
+  const { data: trainersData, isLoading: isTrainersLoading } = useTrainersQuery();
+  const trainers = trainersData?.data || [];
+  console.log("sessions", sessions);
+  const isLoading = isSessionsLoading || isTrainersLoading;
+
   const [selectedSessionId, setSelectedSessionId] = useState<
     string | undefined
   >();
-  const selectSession = mockAvailableSessions.find(
-    (session) => session.id === selectedSessionId
+  const selectSession = sessions.find(
+    (session: Session) => session.id === selectedSessionId
   );
   const [selectedTrainerIds, setSelectedTrainerIds] = useState<string[]>([]);
-  const [filteredSessions, setFilteredSessions] = useState(
-    mockAvailableSessions
-  );
+  const [filteredSessions, setFilteredSessions] = useState(sessions);
 
-  const trainerList = mockTrainer.map((trainer) => ({
+  const trainerList = trainers.map((trainer: Trainer) => ({
     value: trainer.id,
     label: trainer.name,
   }));
 
   useEffect(() => {
-    const filtered = mockAvailableSessions.filter((session) => {
+    if (isLoading) return;
+    const filtered = sessions.filter((session: Session) => {
       const matchesSession =
         !selectedSessionId || session.id === selectedSessionId;
       const matchesTrainer =
@@ -136,14 +64,8 @@ const AvailableSessions = () => {
       return matchesSession && matchesTrainer;
     });
     setFilteredSessions(filtered);
-  }, [selectedSessionId, selectedTrainerIds]);
+  }, [selectedSessionId, selectedTrainerIds, sessions, isLoading]);
 
-  useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-  }, []);
   return (
     <div>
       <h1 className="text-xl font-semibold mb-2">Available Sessions</h1>
@@ -153,12 +75,12 @@ const AvailableSessions = () => {
           onValueChange={(value) => setSelectedSessionId(value)}
         >
           <SelectTrigger className="w-[200px] h-[40px] border-0 shadow hover:border-blue-500">
-            {selectedSessionId ? selectSession?.type : "Select Session Type"}
+            {selectedSessionId ? selectSession?.name : "Select Session Type"}
           </SelectTrigger>
           <SelectContent>
-            {mockAvailableSessions.map((session) => (
+            {sessions.map((session: Session) => (
               <SelectItem key={session.id} value={session.id}>
-                {session.type}
+                {session.name}
               </SelectItem>
             ))}
             <Button
@@ -186,15 +108,13 @@ const AvailableSessions = () => {
         />
       </div>
       <div className="flex space-x-4">
-        {filteredSessions.map((session, index) => (
-          <>
-            {!isLoading ? (
+        {!isLoading
+          ? filteredSessions.map((session: Session) => (
               <SessionCard key={session.id} session={session} />
-            ) : (
+            ))
+          : [1, 2, 3, 4, 5].map((_, index) => (
               <Skeleton key={index} className="w-[19%] h-[150px]" />
-            )}
-          </>
-        ))}
+            ))}
       </div>
     </div>
   );

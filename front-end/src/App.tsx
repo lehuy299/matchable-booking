@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import YourBookings from "./components/YourBookings";
 import CheckoutPage from "./components/CheckoutPage";
 import Topbar from "./components/Topbar";
@@ -6,9 +6,21 @@ import { Route, Routes } from "react-router";
 import { Cart } from "./types/types";
 import AvailableSessions from "./components/AvailableSessions";
 import LoginPage from "./components/LoginPage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
+import RegisterPage from "./components/RegisterPage";
+import { ProtectedRoute } from "./route/ProtectedRoute";
 
 function App() {
-  const [cartList, setCartList] = useState<Cart[]>([]);
+  const [cartList, setCartList] = useState<Cart[]>(() => {
+    const savedCart = localStorage.getItem("cartList");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+  const queryClient = new QueryClient();
+
+  useEffect(() => {
+    localStorage.setItem("cartList", JSON.stringify(cartList));
+  }, [cartList]);
 
   const handleRemoveFromCart = (index: number) => {
     const updatedCart = [...cartList];
@@ -17,33 +29,40 @@ function App() {
   };
 
   return (
-    <div className="w-full">
-      <Topbar cartList={cartList} />
-      <div className="w-full p-6">
+    <QueryClientProvider client={queryClient}>
+      <div className="w-full">
         <Routes>
-          <Route path="available-bookings" element={<AvailableSessions />} />
           <Route
-            path="your-bookings"
             element={
-              <YourBookings
-                setCartList={setCartList}
+              <ProtectedRoute
                 cartList={cartList}
+                handleRemoveFromCart={handleRemoveFromCart}
               />
             }
-          />
-          <Route
-            path="checkout"
-            element={
-              <CheckoutPage
-                cartList={cartList}
-                onRemove={handleRemoveFromCart}
-              />
-            }
-          />
-          <Route path='login' element={<LoginPage />} />
+          >
+            <Route path="/" element={<AvailableSessions />} />
+            <Route
+              path="your-bookings"
+              element={
+                <YourBookings setCartList={setCartList} cartList={cartList} />
+              }
+            />
+            <Route
+              path="checkout"
+              element={
+                <CheckoutPage
+                  cartList={cartList}
+                  onRemove={handleRemoveFromCart}
+                />
+              }
+            />
+          </Route>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
         </Routes>
       </div>
-    </div>
+      <ToastContainer />
+    </QueryClientProvider>
   );
 }
 

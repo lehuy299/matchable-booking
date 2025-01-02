@@ -8,7 +8,8 @@ interface CartOverviewProps {
 
 function CartOverview({ cartList, onRemove }: CartOverviewProps) {
   const totalCost = cartList.reduce((total, session) => total + session.price, 0);
-
+  console.log("cartList", cartList);
+  
   return (
     <div>
       {cartList.length === 0 ? (
@@ -26,10 +27,7 @@ function CartOverview({ cartList, onRemove }: CartOverviewProps) {
                   <strong>Trainer:</strong> {session.trainer}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Start Time:</strong> {session.startTime}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>End Time:</strong> {format(session.endTime, "yyyy-MM-dd HH:mm")}
+                  <strong>Start Date and Time:</strong> {format(session.startDate, "yyyy-MM-dd HH:mm")}
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong>Duration:</strong> {session.duration} Hour{session.duration > 1 ? "s" : ""}

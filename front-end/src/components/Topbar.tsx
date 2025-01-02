@@ -14,13 +14,15 @@ import {
 } from "@/components/ui/navigation-menu";
 import { format } from "date-fns";
 import { Cart } from "@/types/types";
+import { useNavigate } from "react-router";
 
 interface CartItemProps {
   item: Cart;
+  onRemove: () => void;
 }
 
-const CartItem = ({ item }: CartItemProps) => (
-  <div className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 h-[150px]">
+const CartItem = ({ item, onRemove }: CartItemProps) => (
+  <div className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 h-[180px] relative">
     <p>
       <span className="font-medium">Session:</span> {item.sessionType}
     </p>
@@ -29,21 +31,32 @@ const CartItem = ({ item }: CartItemProps) => (
     </p>
     <p>
       <span className="font-medium">Start date:</span>{" "}
-      {format(item.startTime, "yyyy-MM-dd")}
+      {format(item.startDate, "yyyy-MM-dd")}
     </p>
     <p>
       <span className="font-medium">Time slot:</span>{" "}
-      {format(item.startTime, "HH:mm")} - {item.duration} Hour
+      {format(item.startDate, "HH:mm")} - {item.duration} Hour
       {item.duration > 1 ? "s" : ""}
     </p>
+    <p>
+      <span className="font-medium">Cost:</span> ${item.price}
+    </p>
+    <button
+      onClick={onRemove}
+      className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs"
+    >
+      Remove
+    </button>
   </div>
 );
 
 interface TopbarProps {
   cartList: Cart[];
-};
+  handleRemoveFromCart: (index: number) => void;
+}
 
-function Topbar({ cartList }: TopbarProps) {
+function Topbar({ cartList, handleRemoveFromCart }: TopbarProps) {
+  const navigate = useNavigate();
   return (
     <div className="bg-zinc-900 text-white p-4 flex justify-between items-center shadow-md">
       <div className="flex gap-4 align-middle">
@@ -51,17 +64,26 @@ function Topbar({ cartList }: TopbarProps) {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/available-bookings" className={`${navigationMenuTriggerStyle()} cursor-pointer`}>
+              <NavigationMenuLink
+                href="/"
+                className={`${navigationMenuTriggerStyle()} cursor-pointer`}
+              >
                 Available Bookings
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/your-bookings" className={`${navigationMenuTriggerStyle()} cursor-pointer`}>
+              <NavigationMenuLink
+                href="/your-bookings"
+                className={`${navigationMenuTriggerStyle()} cursor-pointer`}
+              >
                 Your Bookings
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/checkout" className={`${navigationMenuTriggerStyle()} cursor-pointer`}>
+              <NavigationMenuLink
+                href="/checkout"
+                className={`${navigationMenuTriggerStyle()} cursor-pointer`}
+              >
                 Checkout
               </NavigationMenuLink>
             </NavigationMenuItem>
@@ -90,10 +112,22 @@ function Topbar({ cartList }: TopbarProps) {
           ) : (
             <div className="flex gap-2 flex-col">
               {cartList.map((item, index) => (
-                <CartItem key={index} item={item} />
+                <CartItem
+                  key={index}
+                  item={item}
+                  onRemove={() => handleRemoveFromCart(index)}
+                />
               ))}
             </div>
           )}
+          <Button
+            variant="secondary"
+            size="sm"
+            className="w-full mt-4"
+            onClick={() => navigate("/checkout")}
+          >
+            Checkout
+          </Button>
         </PopoverContent>
       </Popover>
     </div>

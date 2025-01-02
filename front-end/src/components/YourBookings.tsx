@@ -11,124 +11,57 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Cart, Session } from "@/types/types";
+import { Cart, Session, Trainer } from "@/types/types";
 import { useSearchParams } from "react-router";
-
-// Mock available sessions and bookings
-const availableSessions = [
-  {
-    id: "1",
-    type: "Padel",
-    price: 50,
-    trainers: [
-      {
-        id: "1",
-        name: "John",
-      },
-      {
-        id: "2",
-        name: "Sara",
-      },
-    ],
-  },
-  {
-    id: "2",
-    type: "Fitness",
-    price: 40,
-    trainers: [
-      {
-        id: "3",
-        name: "Tom",
-      },
-      {
-        id: "4",
-        name: "Anna",
-      },
-    ],
-  },
-  {
-    id: "3",
-    type: "Tennis",
-    trainers: [
-      {
-        id: "3",
-        name: "Mike",
-      },
-      {
-        id: "6",
-        name: "Emma",
-      },
-    ],
-  },
-];
-
-// Mock booked sessions for trainers
-const mockBookings = [
-  {
-    session: "Padel",
-    trainer: {
-      id: "1",
-      name: "John",
-      price: 50,
-    },
-    startTime: new Date("2024-12-28T10:00"),
-    endTime: new Date("2024-12-28T12:00"),
-  },
-  {
-    session: "Padel",
-    trainer: {
-      id: "2",
-      name: "Sara",
-      price: 40,
-    },
-    startTime: new Date("2024-12-28T09:00"),
-    endTime: new Date("2024-12-28T10:30"),
-  },
-  {
-    session: "Tennis",
-    trainer: {
-      id: "3",
-      name: "Mike",
-      price: 60,
-    },
-    startTime: new Date("2024-12-28T15:00"),
-    endTime: new Date("2024-12-28T16:00"),
-  },
-];
+import { useBookingsQuery, useSessionsQuery } from "@/api/queries";
+import { toast } from 'react-toastify';
 
 interface BookingCardProps {
   booking: {
-    session: string;
-    trainer: {
-      id: string;
-      name: string;
+    trainerSession: {
+      costPerHour: number;
+      session: Session;
+      trainer: Trainer;
     };
-    startTime: Date;
-    endTime: Date;
+    startDate: Date;
+    duration: number;
   };
 }
 
-const BookingCard = ({ booking }: BookingCardProps) => (
-  <div className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 w-[19%] h-[150px]">
-    <p>
-      <span className="font-medium">Session:</span> {booking.session}
-    </p>
-    <p>
-      <span className="font-medium">Trainer:</span> {booking.trainer.name}
-    </p>
-    <p>
-      <span className="font-medium">Start date:</span>{" "}
-      {format(booking.startTime, "yyyy-MM-dd")}
-    </p>
-    <p>
-      <span className="font-medium">Time slot:</span>{" "}
-      {format(booking.startTime, "HH:mm")} - {format(booking.endTime, "HH:mm")}
-    </p>
-  </div>
-);
-
 const getHourDisplay = (hour: string | number) => {
   return `${hour} Hour${Number(hour) > 1 ? "s" : ""}`;
+};
+
+const BookingCard = ({ booking }: BookingCardProps) => {
+  const cost =
+    Number(booking.trainerSession.costPerHour) * Number(booking.duration);
+  return (
+    <div className="p-4 border rounded-md shadow-sm space-y-2 bg-gray-50 w-[19%] h-[216px]">
+      <p>
+        <span className="font-medium">Session:</span>{" "}
+        {booking.trainerSession?.session?.name}
+      </p>
+      <p>
+        <span className="font-medium">Trainer:</span>{" "}
+        {booking?.trainerSession?.trainer?.name}
+      </p>
+      <p>
+        <span className="font-medium">Start Date:</span>{" "}
+        {format(booking.startDate, "yyyy-MM-dd")}
+      </p>
+      <p>
+        <span className="font-medium">Start Time:</span>{" "}
+        {format(booking?.startDate, "HH:mm")}
+      </p>
+      <p>
+        <span className="font-medium">Duration:</span>{" "}
+        {getHourDisplay(booking?.duration)}
+      </p>
+      <p>
+        <span className="font-medium">Cost:</span> {cost}$
+      </p>
+    </div>
+  );
 };
 
 interface YourBookingsProps {
@@ -138,22 +71,33 @@ interface YourBookingsProps {
 }
 
 function YourBookings({ cartList, setCartList }: YourBookingsProps) {
+  const { data: bookingsData, isLoading: isBookingsLoading } =
+    useBookingsQuery();
+  const { data: sessionsData, isLoading: isSessionsLoading } =
+    useSessionsQuery();
+  const availableSessions = sessionsData?.data || [];
+  console.log("availableSessions", availableSessions);
+
+  const bookings = bookingsData?.data || [];
+  console.log("bookings", bookings);
+
   const [searchParams] = useSearchParams();
   const sessionIdFromURL = searchParams.get("sessionId") || "";
 
-  const [selectedSessionId, setSelectedSessionId] = useState<string>(sessionIdFromURL);
-  console.log('selectedSessionId', selectedSessionId);
-  
+  const [selectedSessionId, setSelectedSessionId] =
+    useState<string>(sessionIdFromURL);
+  console.log("selectedSessionId", selectedSessionId);
+
   const selectedSession = availableSessions.find(
     (session) => session.id === selectedSessionId
   );
-  const [startTime, setStartTime] = useState("");
+  const [startDate, setStartDate] = useState("");
   const [selectedDuration, setSelectedDuration] = useState<string>("1");
   const [selectedTrainerId, setSelectedTrainerId] = useState("");
   const selectedTrainer = selectedSession?.trainers.find(
     (trainer) => trainer.id === selectedTrainerId
   );
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoading = isBookingsLoading || isSessionsLoading;
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -161,17 +105,10 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
     setIsVisible(true);
   }, []);
 
-  useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-  }, []);
-
   const handleAddToCart = () => {
     if (
       !selectedSession ||
-      !startTime ||
+      !startDate ||
       !selectedDuration ||
       !selectedTrainer
     ) {
@@ -179,21 +116,25 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
       return;
     }
 
-    const startDateTime = new Date(startTime);
+    const startDateTime = new Date(startDate);
     const endDateTime = add(startDateTime, { hours: Number(selectedDuration) });
 
     const sessionDetails = {
-      sessionType: selectedSession.type,
-      startTime: startDateTime.toISOString(),
+      sessionType: selectedSession.name,
+      startDate: startDateTime.toISOString(),
       endTime: endDateTime.toISOString(),
       trainer: selectedTrainer.name,
       duration: Number(selectedDuration),
-      price: selectedSession.price! * Number(selectedDuration),
+      price: Number(selectedTrainer?.costPerHour) * Number(selectedDuration),
+      trainerId: selectedTrainer.id,
+      sessionId: selectedSession.id,
     };
+
+    toast("Session added to cart", { type: "success" });
 
     setCartList([...cartList, sessionDetails]);
     setSelectedSessionId("");
-    setStartTime("");
+    setStartDate("");
     setSelectedDuration("1");
     setSelectedTrainerId("");
   };
@@ -203,19 +144,17 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
       {/* Available Bookings */}
       <div>
         <h2 className="text-lg font-semibold mb-2">Your Bookings</h2>
-        {mockBookings.length === 0 ? (
+        {bookings.length === 0 && !isLoading ? (
           <p className="text-sm text-gray-500">No bookings found.</p>
         ) : (
           <div className="flex flex-wrap gap-x-[1%] gap-y-4">
-            {mockBookings.map((booking, index) => (
-              <>
-                {!isLoading ? (
+            {!isLoading
+              ? bookings.map((booking, index) => (
                   <BookingCard key={index} booking={booking} />
-                ) : (
-                  <Skeleton key={index} className="w-[19%] h-[150px]" />
-                )}
-              </>
-            ))}
+                ))
+              : [1, 2, 3, 4, 5].map((index) => (
+                  <Skeleton key={index} className="w-[19%] h-[216px]" />
+                ))}
           </div>
         )}
       </div>
@@ -228,16 +167,30 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
         <h2 className="text-lg font-bold">Book your own session</h2>
         <div>
           <Label className="block mb-2 text-sm font-medium">Session</Label>
-          <Select value={selectedSessionId} onValueChange={(value) => setSelectedSessionId(value)}>
+          <Select
+            value={selectedSessionId}
+            onValueChange={(value) => setSelectedSessionId(value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select Session Type" />
             </SelectTrigger>
             <SelectContent>
               {availableSessions.map((session) => (
                 <SelectItem key={session.id} value={session.id}>
-                  {session.type}
+                  {session.name}
                 </SelectItem>
               ))}
+              <Button
+                className="w-full px-2"
+                variant="secondary"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedSessionId("");
+                }}
+              >
+                Clear
+              </Button>
             </SelectContent>
           </Select>
         </div>
@@ -246,11 +199,12 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
             Select Trainer
           </Label>
           <Select
+            value={selectedTrainerId}
             onValueChange={(value) => setSelectedTrainerId(value)}
             disabled={!selectedSessionId}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Trainer" />
+              {selectedTrainerId ? selectedTrainer?.name : "Select Trainer"}
             </SelectTrigger>
             <SelectContent>
               {selectedSession?.trainers.map((trainer) => (
@@ -258,6 +212,17 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
                   {trainer.name}
                 </SelectItem>
               ))}
+              <Button
+                className="w-full px-2"
+                variant="secondary"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedTrainerId("");
+                }}
+              >
+                Clear
+              </Button>
             </SelectContent>
           </Select>
         </div>
@@ -266,8 +231,8 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
           <div className="w-1/2 -mt-2">
             <Input
               type="datetime-local"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
               className="w-full"
             />
           </div>
@@ -275,7 +240,9 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
             <Select onValueChange={(value) => setSelectedDuration(value)}>
               <SelectTrigger className="w-full">
                 {/* <SelectValue placeholder="Select Duration (Hours)" /> */}
-                {selectedDuration ? getHourDisplay(selectedDuration) : "Select Duration (Hours)"}
+                {selectedDuration
+                  ? getHourDisplay(selectedDuration)
+                  : "Select Duration (Hours)"}
               </SelectTrigger>
               <SelectContent>
                 {[1, 2, 3, 4].map((hour) => (
@@ -288,11 +255,18 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
           </div>
         </div>
         <div>
+          Cost:{" "}
+          {selectedTrainerId
+            ? Number(selectedTrainer?.costPerHour) * Number(selectedDuration)
+            : ""}
+          $
+        </div>
+        <div>
           <Button
             onClick={handleAddToCart}
             disabled={
               !selectedSession ||
-              !startTime ||
+              !startDate ||
               !selectedDuration ||
               !selectedTrainer
             }

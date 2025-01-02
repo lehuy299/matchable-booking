@@ -2,8 +2,10 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
-import { useNavigate } from "react-router";
+import axios from "@/api/axios";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "@/provider/authProvider";
+import { toast } from "react-toastify";
 
 interface LoginFormValues {
   email: string;
@@ -19,13 +21,14 @@ const LoginSchema = Yup.object().shape({
 
 export default function LoginPage(): JSX.Element {
   const navigate = useNavigate();
+  const { setToken } = useAuth();
   const handleSubmit = async (values: LoginFormValues): Promise<void> => {
-    console.log(values);
     try {
-      const response = await axios.post("http://localhost:3000/auth/sign-in", values);
-      console.log(response);
-      //navigate("/");
+      const response = await axios.post("/auth/sign-in", values);
+      setToken(response.data.accessToken);
+      setTimeout(() => navigate("/"), 500);
     } catch (error) {
+      toast.error("Login failed: ", error.message);
       console.error(error);
     }
   };
@@ -80,6 +83,10 @@ export default function LoginPage(): JSX.Element {
                   className="mt-1 text-sm text-red-600"
                 />
               </div>
+
+              <p>
+                Don't have an account? <Link to="/register">Register here</Link>
+              </p>
 
               {/* Submit Button */}
               <Button type="submit" disabled={isSubmitting} className="w-full">

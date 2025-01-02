@@ -1,11 +1,23 @@
-import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import axios from "@/api/axios";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 function BookingForm() {
+  const [cartList, setCartList] = useState([]);
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cartList');
+    if (savedCart) {
+      setCartList(JSON.parse(savedCart));
+    }
+  }, []);
+  console.log('cartList', cartList);
+  
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -23,8 +35,14 @@ function BookingForm() {
         .oneOf([true], "You must accept the terms and conditions")
         .required(),
     }),
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async () => {
+      try {
+        await axios.post("/bookings", cartList);
+        toast.success("Booking successful!");
+      } catch (error) {
+        toast.error("Booking failed: ", error.message);
+      }
+      
     },
   });
 
@@ -110,6 +128,7 @@ function BookingForm() {
       <Button
         type="submit"
         className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+        disabled={!formik.values.termsAccepted}
       >
         Submit Booking
       </Button>

@@ -1,6 +1,6 @@
 export interface Cart {
   sessionType: string;
-  startTime: string;
+  startDate: string;
   endTime: string;
   trainer: string;
   duration: number;
@@ -15,7 +15,7 @@ export interface Trainer {
 
 export interface Session {
   id: string;
-  type: string;
+  name: string;
   trainers: Trainer[];
 }
 
@@ -23,7 +23,7 @@ export interface Booking {
   id: string;
   session: Session;
   trainer: Trainer;
-  startTime: string;
+  startDate: string;
   duration: number;
   price: number;
 }

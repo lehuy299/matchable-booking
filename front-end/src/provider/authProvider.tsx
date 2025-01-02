@@ -1,5 +1,5 @@
 
-import axios from "axios";
+import axios from "@/api/axios";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 interface AuthContextType {
@@ -12,7 +12,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // State to hold the authentication token
   const [token, setToken_] = useState(localStorage.getItem("token"));
-
+  
   // Function to set the authentication token
   const setToken = (newToken: string) => {
     setToken_(newToken);
