@@ -57,6 +57,12 @@ interface TopbarProps {
 
 function Topbar({ cartList, handleRemoveFromCart }: TopbarProps) {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
   return (
     <div className="bg-zinc-900 text-white p-4 flex justify-between items-center shadow-md">
       <div className="flex gap-4 align-middle">
@@ -90,46 +96,56 @@ function Topbar({ cartList, handleRemoveFromCart }: TopbarProps) {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            size="icon"
-            className="bg-white hover:bg-gray-100 hover:border-gray-100 text-black rounded-full transition duration-200 mr-2 relative"
-          >
-            <ShoppingCart className="w-8 h-8" />
-            {!!cartList.length && (
-              <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex justify-center items-center text-xs">
-                {cartList.length}
+      <div className="flex items-center gap-4">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              size="icon"
+              className="bg-white hover:bg-gray-100 hover:border-gray-100 text-black rounded-full transition duration-200 mr-2 relative"
+            >
+              <ShoppingCart className="w-8 h-8" />
+              {!!cartList.length && (
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex justify-center items-center text-xs">
+                  {cartList.length}
+                </div>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 mr-[15px]">
+            {cartList.length === 0 ? (
+              <p className="text-sm text-gray-500">
+                No sessions added to the cart.
+              </p>
+            ) : (
+              <div className="flex gap-2 flex-col">
+                {cartList.map((item, index) => (
+                  <CartItem
+                    key={index}
+                    item={item}
+                    onRemove={() => handleRemoveFromCart(index)}
+                  />
+                ))}
               </div>
             )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 mr-[15px]">
-          {cartList.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              No sessions added to the cart.
-            </p>
-          ) : (
-            <div className="flex gap-2 flex-col">
-              {cartList.map((item, index) => (
-                <CartItem
-                  key={index}
-                  item={item}
-                  onRemove={() => handleRemoveFromCart(index)}
-                />
-              ))}
-            </div>
-          )}
-          <Button
-            variant="secondary"
-            size="sm"
-            className="w-full mt-4"
-            onClick={() => navigate("/checkout")}
-          >
-            Checkout
-          </Button>
-        </PopoverContent>
-      </Popover>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full mt-4"
+              onClick={() => navigate("/checkout")}
+            >
+              Checkout
+            </Button>
+          </PopoverContent>
+        </Popover>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="bg-red-500 text-white"
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
+      </div>
     </div>
   );
 }
