@@ -34,6 +34,12 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  });
+
   // enable DI for class-validator
   useContainer(app.select(AuthModule), { fallbackOnErrors: true });
 
