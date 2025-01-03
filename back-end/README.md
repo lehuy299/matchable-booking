@@ -2,6 +2,10 @@
 
 Project that allows clients to book one or more personal training sessions for padel, fitness, or tennis.
 
+## Deployment
+- Database is deployed on [https://neon.tech](https://neon.tech)
+- Back-end server is deployed on [https://railway.com](https://railway.com)
+
 ## 💻 Stack
 
 - [nestjs/typeorm](https://github.com/nestjs/typeorm): Integration of TypeORM with NestJS for database management.
