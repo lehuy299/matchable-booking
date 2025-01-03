@@ -16,9 +16,9 @@ To run the back-end of the application, follow these steps:
 2. Start the Docker containers:
    ```docker compose up -D```
 3. Install the necessary dependencies:
-   ```npm install```
+   ```pnpm i```
 4. Start the development server:
-   ```npm start:dev```
+   ```pnpm start:dev```
 
 To run the back-end of the application, follow these steps:
 
