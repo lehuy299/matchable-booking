@@ -19,3 +19,8 @@ To run the back-end of the application, follow these steps:
    ```npm install```
 4. Start the development server:
    ```npm start:dev```
+
+To run the back-end of the application, follow these steps:
+
+1. Navigate to the front-end directory: ```cd front-end```
+2. Start the web dev server: ```npm run dev```
