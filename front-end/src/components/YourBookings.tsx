@@ -86,8 +86,8 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
   const [selectedSessionId, setSelectedSessionId] =
     useState<string>(sessionIdFromURL);
 
-  const selectedSession = availableSessions.find(
-    (session: Session) => session.id === selectedSessionId
+  const [selectedSession, setSelectedSession] = useState<Session | undefined>(
+    undefined
   );
   const [startDate, setStartDate] = useState("");
   const [selectedDuration, setSelectedDuration] = useState<string>("1");
@@ -102,6 +102,17 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  useEffect(() => {
+    if (availableSessions.length > 0 && selectedSessionId) {
+      const session = availableSessions.find(
+        (session: Session) => session.id.toString() === selectedSessionId.toString()
+      );
+      setSelectedSession(session);
+    } else {
+      setSelectedSession(undefined);
+    }
+  }, [availableSessions, selectedSessionId, searchParams]);
 
   const handleAddToCart = () => {
     if (

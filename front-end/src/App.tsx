@@ -21,6 +21,8 @@ function App() {
     localStorage.setItem("cartList", JSON.stringify(cartList));
   }, [cartList]);
 
+  const emptyCartList = () => setCartList([]);
+
   const handleRemoveFromCart = (index: number) => {
     const updatedCart = [...cartList];
     updatedCart.splice(index, 1);
@@ -52,6 +54,7 @@ function App() {
                 <CheckoutPage
                   cartList={cartList}
                   onRemove={handleRemoveFromCart}
+                  emptyCartList={emptyCartList}
                 />
               }
             />

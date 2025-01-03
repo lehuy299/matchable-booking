@@ -4,21 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "@/api/axios";
-import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Cart } from "@/types/types";
 import { useNavigate } from "react-router";
 
-function BookingForm() {
-  const [cartList, setCartList] = useState<Cart[]>([]);
+function BookingForm({ cartList, emptyCartList }: { cartList: Cart[], emptyCartList: () => void }) {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cartList');
-    if (savedCart) {
-      setCartList(JSON.parse(savedCart));
-    }
-  }, []);
   const payload = cartList.map((item) => ({
     duration: item.duration,
     sessionId: item.sessionId,
@@ -46,6 +38,7 @@ function BookingForm() {
     onSubmit: async () => {
       try {
         await axios.post("/bookings", payload);
+        emptyCartList();
         navigate('/your-bookings');
         toast.success("Booking successful!");
       } catch (error: any) {

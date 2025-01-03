@@ -13,6 +13,7 @@ export interface Trainer {
   id: string;
   name: string;
   price?: number;
+  costPerHour?: number;
 };
 
 export interface Session {
