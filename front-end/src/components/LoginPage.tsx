@@ -28,7 +28,7 @@ export default function LoginPage(): JSX.Element {
       setToken(response.data.accessToken);
       setTimeout(() => navigate("/"), 500);
     } catch (error: any) {
-      toast.error("Login failed: " + error.message);
+      toast.error("Login failed: " + error?.response?.data?.message);
       console.error(error);
     }
   };
