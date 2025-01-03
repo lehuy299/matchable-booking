@@ -7,9 +7,12 @@ import axios from "@/api/axios";
 import { toast } from "react-toastify";
 import { Cart } from "@/types/types";
 import { useNavigate } from "react-router";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 function BookingForm({ cartList, emptyCartList }: { cartList: Cart[], emptyCartList: () => void }) {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const payload = cartList.map((item) => ({
     duration: item.duration,
@@ -37,12 +40,15 @@ function BookingForm({ cartList, emptyCartList }: { cartList: Cart[], emptyCartL
     }),
     onSubmit: async () => {
       try {
+        setIsSubmitting(true);
         await axios.post("/bookings", payload);
         emptyCartList();
         navigate('/your-bookings');
         toast.success("Booking successful!");
       } catch (error: any) {
         toast.error("Booking failed: " + error?.response?.data?.error);
+      } finally {
+        setIsSubmitting(false);
       }
       
     },
@@ -130,9 +136,9 @@ function BookingForm({ cartList, emptyCartList }: { cartList: Cart[], emptyCartL
       <Button
         type="submit"
         className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
-        disabled={!formik.values.termsAccepted}
+        disabled={!formik.values.termsAccepted || isSubmitting}
       >
-        Submit Booking
+        {!isSubmitting ? 'Submit Booking' : <Loader2 className="animate-spin" />}
       </Button>
     </form>
   );
