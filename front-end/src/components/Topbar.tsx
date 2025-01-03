@@ -8,13 +8,12 @@ import {
 import {
   NavigationMenu,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { format } from "date-fns";
 import { Cart } from "@/types/types";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 interface CartItemProps {
   item: Cart;
@@ -59,8 +58,8 @@ function Topbar({ cartList, handleRemoveFromCart }: TopbarProps) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
@@ -70,28 +69,28 @@ function Topbar({ cartList, handleRemoveFromCart }: TopbarProps) {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuLink
-                href="/"
+              <Link
+                to="/"
                 className={`${navigationMenuTriggerStyle()} cursor-pointer`}
               >
                 Available Bookings
-              </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink
-                href="/your-bookings"
+              <Link
+                to="/your-bookings"
                 className={`${navigationMenuTriggerStyle()} cursor-pointer`}
               >
                 Your Bookings
-              </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink
-                href="/checkout"
+              <Link
+                to="/checkout"
                 className={`${navigationMenuTriggerStyle()} cursor-pointer`}
               >
                 Checkout
-              </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
