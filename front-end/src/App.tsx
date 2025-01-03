@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import YourBookings from "./components/YourBookings";
 import CheckoutPage from "./components/CheckoutPage";
-import Topbar from "./components/Topbar";
 import { Route, Routes } from "react-router";
 import { Cart } from "./types/types";
 import AvailableSessions from "./components/AvailableSessions";

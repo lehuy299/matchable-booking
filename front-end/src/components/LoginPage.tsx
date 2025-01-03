@@ -27,7 +27,7 @@ export default function LoginPage(): JSX.Element {
       const response = await axios.post("/auth/sign-in", values);
       setToken(response.data.accessToken);
       setTimeout(() => navigate("/"), 500);
-    } catch (error) {
+    } catch (error: any) {
       toast.error("Login failed: ", error.message);
       console.error(error);
     }

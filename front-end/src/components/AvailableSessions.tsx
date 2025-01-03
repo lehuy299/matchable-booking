@@ -34,7 +34,6 @@ const AvailableSessions = () => {
   const sessions = sessionsData?.data || [];
   const { data: trainersData, isLoading: isTrainersLoading } = useTrainersQuery();
   const trainers = trainersData?.data || [];
-  console.log("sessions", sessions);
   const isLoading = isSessionsLoading || isTrainersLoading;
 
   const [selectedSessionId, setSelectedSessionId] = useState<

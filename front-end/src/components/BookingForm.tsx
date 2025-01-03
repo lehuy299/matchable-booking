@@ -48,7 +48,7 @@ function BookingForm() {
         await axios.post("/bookings", payload);
         navigate('/your-bookings');
         toast.success("Booking successful!");
-      } catch (error) {
+      } catch (error: any) {
         toast.error("Booking failed: ", error.message);
       }
       

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { add, format, set } from "date-fns";
+import { useEffect, useState } from "react";
+import { add, format } from "date-fns";
 import {
   Select,
   SelectTrigger,
@@ -14,18 +14,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Cart, Session, Trainer } from "@/types/types";
 import { useSearchParams } from "react-router";
 import { useBookingsQuery, useSessionsQuery } from "@/api/queries";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+
+interface Booking {
+  trainerSession: {
+    costPerHour: number;
+    session: Session;
+    trainer: Trainer;
+  };
+  startDate: Date;
+  duration: number;
+}
 
 interface BookingCardProps {
-  booking: {
-    trainerSession: {
-      costPerHour: number;
-      session: Session;
-      trainer: Trainer;
-    };
-    startDate: Date;
-    duration: number;
-  };
+  booking: Booking;
 }
 
 const getHourDisplay = (hour: string | number) => {
@@ -76,26 +78,23 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
   const { data: sessionsData, isLoading: isSessionsLoading } =
     useSessionsQuery();
   const availableSessions = sessionsData?.data || [];
-  console.log("availableSessions", availableSessions);
 
   const bookings = bookingsData?.data || [];
-  console.log("bookings", bookings);
 
   const [searchParams] = useSearchParams();
   const sessionIdFromURL = searchParams.get("sessionId") || "";
 
   const [selectedSessionId, setSelectedSessionId] =
     useState<string>(sessionIdFromURL);
-  console.log("selectedSessionId", selectedSessionId);
 
   const selectedSession = availableSessions.find(
-    (session) => session.id === selectedSessionId
+    (session: Session) => session.id === selectedSessionId
   );
   const [startDate, setStartDate] = useState("");
   const [selectedDuration, setSelectedDuration] = useState<string>("1");
   const [selectedTrainerId, setSelectedTrainerId] = useState("");
   const selectedTrainer = selectedSession?.trainers.find(
-    (trainer) => trainer.id === selectedTrainerId
+    (trainer: Trainer) => trainer.id === selectedTrainerId
   );
   const isLoading = isBookingsLoading || isSessionsLoading;
 
@@ -149,7 +148,7 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
         ) : (
           <div className="flex flex-wrap gap-x-[1%] gap-y-4">
             {!isLoading
-              ? bookings.map((booking, index) => (
+              ? bookings.map((booking: Booking, index: number) => (
                   <BookingCard key={index} booking={booking} />
                 ))
               : [1, 2, 3, 4, 5].map((index) => (
@@ -175,7 +174,7 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
               <SelectValue placeholder="Select Session Type" />
             </SelectTrigger>
             <SelectContent>
-              {availableSessions.map((session) => (
+              {availableSessions.map((session: Session) => (
                 <SelectItem key={session.id} value={session.id}>
                   {session.name}
                 </SelectItem>
@@ -207,7 +206,7 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
               {selectedTrainerId ? selectedTrainer?.name : "Select Trainer"}
             </SelectTrigger>
             <SelectContent>
-              {selectedSession?.trainers.map((trainer) => (
+              {selectedSession?.trainers.map((trainer: Trainer) => (
                 <SelectItem key={trainer.id} value={trainer.id}>
                   {trainer.name}
                 </SelectItem>

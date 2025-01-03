@@ -1,4 +1,5 @@
 export interface Cart {
+  sessionType: string;
   sessionId: string;
   startDate: string;
   endTime: string;

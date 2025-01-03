@@ -8,7 +8,6 @@ interface CartOverviewProps {
 
 function CartOverview({ cartList, onRemove }: CartOverviewProps) {
   const totalCost = cartList.reduce((total, session) => total + session.price, 0);
-  console.log("cartList", cartList);
   
   return (
     <div>

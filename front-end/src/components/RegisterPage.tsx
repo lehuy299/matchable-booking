@@ -24,7 +24,7 @@ const RegisterSchema = Yup.object().shape({
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .oneOf([Yup.ref("password"), ""], "Passwords must match")
     .required("Confirm password is required"),
   firstname: Yup.string()
     .matches(/^[a-zA-Z]+$/, "First name must contain only letters")
@@ -46,7 +46,7 @@ export default function RegisterPage(): JSX.Element {
       setToken(response.data.accessToken);
       toast.success("Registration successful!. Please login to continue.");
       navigate("/login");
-    } catch (error) {
+    } catch (error: any) {
       toast.error("Registration failed: ", error.message);
       setErrorMessage("Registration failed: " + error.message);
       console.error(error);
