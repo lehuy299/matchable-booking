@@ -26,7 +26,7 @@ function App() {
     updatedCart.splice(index, 1);
     setCartList(updatedCart);
   };
-
+  
   return (
     <QueryClientProvider client={queryClient}>
       <div className="w-full">

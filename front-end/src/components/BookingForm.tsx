@@ -49,7 +49,7 @@ function BookingForm() {
         navigate('/your-bookings');
         toast.success("Booking successful!");
       } catch (error: any) {
-        toast.error("Booking failed: ", error.message);
+        toast.error("Booking failed: " + error?.response?.data?.error);
       }
       
     },

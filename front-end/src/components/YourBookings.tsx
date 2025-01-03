@@ -171,7 +171,7 @@ function YourBookings({ cartList, setCartList }: YourBookingsProps) {
             onValueChange={(value) => setSelectedSessionId(value)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Session Type" />
+              {selectedSessionId ? selectedSession?.name : "Select Session Type"}
             </SelectTrigger>
             <SelectContent>
               {availableSessions.map((session: Session) => (

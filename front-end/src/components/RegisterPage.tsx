@@ -47,7 +47,7 @@ export default function RegisterPage(): JSX.Element {
       toast.success("Registration successful!. Please login to continue.");
       navigate("/login");
     } catch (error: any) {
-      toast.error("Registration failed: ", error.message);
+      toast.error("Registration failed: " + error.message);
       setErrorMessage("Registration failed: " + error.message);
       console.error(error);
     }
