@@ -3,7 +3,11 @@ import { IsDateString, IsNotEmpty, IsNumber } from 'class-validator';
 export class CreateBookingDTO {
   @IsNumber()
   @IsNotEmpty()
-  trainerSessionId: number;
+  trainerId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  sessionId: number;
 
   @IsDateString()
   @IsNotEmpty()

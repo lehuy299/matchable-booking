@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BookingEntity } from './entites/booking.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { CreateBookingDTO } from './dto/create-booking.dto';
+import { TrainerSessionEntity } from '@/trainer-session/entities/trainer-session.entity';
 
 @Injectable()
 export class BookingsService {
@@ -38,12 +39,27 @@ export class BookingsService {
           const endDate = new Date(
             startDate.getTime() + bookingData.duration * 60 * 60 * 1000,
           );
+  
+          // Find the trainerSessionId using trainerId and sessionId
+          const trainerSession = await transactionalEntityManager
+            .createQueryBuilder()
+            .select('ts.id')
+            .from(TrainerSessionEntity, 'ts')
+            .where('ts.trainerId = :trainerId', { trainerId: bookingData.trainerId })
+            .andWhere('ts.sessionId = :sessionId', { sessionId: bookingData.sessionId })
+            .getOne();
+          
+          if (!trainerSession) {
+            throw new Error(
+              `Trainer session not found for trainerId: ${bookingData.trainerId} and sessionId: ${bookingData.sessionId}`,
+            );
+          }
 
           // Check for overlapping bookings
           const overlap = await transactionalEntityManager
             .createQueryBuilder(BookingEntity, 'b')
             .where('b.trainerSessionId = :trainerSessionId', {
-              trainerSessionId: bookingData.trainerSessionId,
+              trainerSessionId: trainerSession.id,
             })
             .andWhere(
               '(b.startDate < :endDate AND b.startDate >= :startDate)',
@@ -66,6 +82,7 @@ export class BookingsService {
           const booking = transactionalEntityManager.create(BookingEntity, {
             ...bookingData,
             userId,
+            trainerSessionId: trainerSession.id,
           });
 
           await transactionalEntityManager.save(booking);

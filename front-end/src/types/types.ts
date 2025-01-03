@@ -1,8 +1,9 @@
 export interface Cart {
-  sessionType: string;
+  sessionId: string;
   startDate: string;
   endTime: string;
   trainer: string;
+  trainerId: string;
   duration: number;
   price: number;
 }

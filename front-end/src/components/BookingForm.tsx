@@ -6,9 +6,12 @@ import { Label } from "@/components/ui/label";
 import axios from "@/api/axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { Cart } from "@/types/types";
+import { useNavigate } from "react-router";
 
 function BookingForm() {
-  const [cartList, setCartList] = useState([]);
+  const [cartList, setCartList] = useState<Cart[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedCart = localStorage.getItem('cartList');
@@ -16,7 +19,12 @@ function BookingForm() {
       setCartList(JSON.parse(savedCart));
     }
   }, []);
-  console.log('cartList', cartList);
+  const payload = cartList.map((item) => ({
+    duration: item.duration,
+    sessionId: item.sessionId,
+    startDate: item.startDate,
+    trainerId: item.trainerId,
+  }));
   
   const formik = useFormik({
     initialValues: {
@@ -37,7 +45,8 @@ function BookingForm() {
     }),
     onSubmit: async () => {
       try {
-        await axios.post("/bookings", cartList);
+        await axios.post("/bookings", payload);
+        navigate('/your-bookings');
         toast.success("Booking successful!");
       } catch (error) {
         toast.error("Booking failed: ", error.message);
